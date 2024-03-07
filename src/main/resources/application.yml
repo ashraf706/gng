@@ -1,8 +1,11 @@
 application:
   environment: dev
-
+  validator-endpoint: http://ip-api.com/json/
+  ip-header: X-Forwarded-For,HTTP_X_FORWARDED_FOR,HTTP_X_FORWARDED,HTTP_FORWARDED_FOR,HTTP_FORWARDED
+  blocked-countries: China,Spain,USA
+  blocked-isps: AWS,GCP,Azure
 
 spring:
-  h2:
-    console:
-      enabled=true:
+  servlet:
+    multipart:
+      max-file-size: 10MB

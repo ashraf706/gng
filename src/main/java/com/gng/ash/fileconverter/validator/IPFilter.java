@@ -1,5 +1,6 @@
-package com.gng.ash.fileconverter.security;
+package com.gng.ash.fileconverter.validator;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.gng.ash.fileconverter.exceptions.InvalidIPException;
 import com.gng.ash.fileconverter.model.ValidationResult;
 import com.gng.ash.fileconverter.service.AuditLogService;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -18,12 +20,12 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
-import static com.gng.ash.fileconverter.Constants.VALIDATION_RESULT;
-import static com.gng.ash.fileconverter.Utils.calculateElapsedTime;
+import static com.gng.ash.fileconverter.ConstantsAndUtils.*;
+
 
 @Component
 @Slf4j
-public class IPFilter extends GenericFilterBean {
+class IPFilter extends GenericFilterBean {
     private static final String REQUEST_URI = "/api/file/upload";
     private final IPValidator ipValidator;
     private final AuditLogService auditLogService;
@@ -37,27 +39,32 @@ public class IPFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String requestURI = ((HttpServletRequest) request).getRequestURI();
 
-        if(!REQUEST_URI.equals(requestURI)) {
+        if (!REQUEST_URI.equals(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        Instant requestTimeStamp =  Instant.now();
-        ValidationResult result = ipValidator.validate(request);
+        final Instant requestTimeStamp = Instant.now();
+        ValidationResult result = null;
+
         try {
+            result = ipValidator.validate(request);
             if (result.isFail()) {
                 throw new InvalidIPException("Invalid request.");
             }
             request.setAttribute(VALIDATION_RESULT, result);
+            request.setAttribute(REQUEST_TIMESTAMP, requestTimeStamp);
             filterChain.doFilter(request, response);
-        } catch (InvalidIPException exception) {
+        } catch (InvalidIPException | JsonParseException exception) {
             int responseStatus = HttpStatus.FORBIDDEN.value();
-            String errorMsg = String.format("Invalid request. Ip: %1$s, Country code: %2$s, Provider: %3$s.", result.getIpAddress(), result.getCountryCode(), result.getIpProvider());
+            String errorMsg = result != null
+                    ? String.format("Invalid request. Ip: %1$s, Country code: %2$s, Provider: %3$s.", result.getIpAddress(), result.getCountryCode(), result.getIpProvider())
+                    : exception.getMessage();
 
-            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.setStatus(responseStatus);
-            httpServletResponse.getWriter().write(errorMsg);
+            HttpServletResponse errorResponse = (HttpServletResponse) response;
+            errorResponse.setContentType(MediaType.TEXT_PLAIN_VALUE);
+            errorResponse.setStatus(responseStatus);
+            errorResponse.getWriter().write(errorMsg);
 
             auditLogService.saveAuditLog(result, responseStatus, new Date(requestTimeStamp.toEpochMilli()),
                     calculateElapsedTime(requestTimeStamp), requestURI);

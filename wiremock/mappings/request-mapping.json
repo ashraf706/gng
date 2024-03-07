@@ -3,7 +3,7 @@
     {
       "request": {
         "method": "GET",
-        "url": "/json/127.0.0.1"
+        "url": "/json/24.40.0.1"
       },
       "response": {
         "status": 200,
@@ -31,13 +31,83 @@
     {
       "request": {
         "method": "GET",
-        "url": "/api/file"
+        "url": "/json/40.1.0.21"
       },
       "response": {
         "status": 200,
-        "body": "Hello file",
+        "jsonBody": {
+          "query": "40.1.0.21",
+          "status": "success",
+          "country": "China",
+          "countryCode": "CN",
+          "region": "QC",
+          "regionName": "Quebec",
+          "city": "Beijing",
+          "zip": "H1K",
+          "lat": 45.6085,
+          "lon": -73.5493,
+          "timezone": "America/Toronto",
+          "isp": "Some ip in China",
+          "org": "Videotron Ltee",
+          "as": "AS5769 Videotron Ltee"
+        },
         "headers": {
-          "Content-Type": "text/plain"
+          "Content-Type": "application/json"
+        }
+      }
+    },{
+      "request": {
+        "method": "GET",
+        "url": "/json/50.1.0.21"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "query": "50.1.0.21",
+          "status": "success",
+          "country": "Spain",
+          "countryCode": "SP",
+          "region": "SP",
+          "regionName": "Quebec",
+          "city": "Madrid",
+          "zip": "H1K",
+          "lat": 45.6085,
+          "lon": -73.5493,
+          "timezone": "America/Toronto",
+          "isp": "AWS",
+          "org": "Videotron Ltee",
+          "as": "AS5769 Videotron Ltee"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/json/127.0.0.1"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "query": "24.48.0.1",
+          "status": "success",
+          "country": "Canada",
+          "countryCode": "CA",
+          "region": "QC",
+          "regionName": "Quebec",
+          "city": "Montreal",
+          "zip": "H1K",
+          "lat": 45.6085,
+          "lon": -73.5493,
+          "timezone": "America/Toronto",
+          "isp": "Le Groupe Videotron Ltee",
+          "org": "Videotron Ltee",
+          "as": "AS5769 Videotron Ltee"
+        },
+        "headers": {
+          "Content-Type": "application/json"
         }
       }
     }

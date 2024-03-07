@@ -6,9 +6,10 @@ import com.gng.ash.fileconverter.repository.AuditLogRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
-public class AuditLogServiceImpl implements AuditLogService{
+final class AuditLogServiceImpl implements AuditLogService{
     private final AuditLogRepository repository;
 
     public AuditLogServiceImpl(AuditLogRepository repository) {
@@ -16,7 +17,10 @@ public class AuditLogServiceImpl implements AuditLogService{
     }
 
     @Override
-    public AuditLog saveAuditLog(ValidationResult result, int statusCode, Date requestTimeStamp, long elapsedTime, String requestURI) {
+    public Optional<AuditLog> saveAuditLog(ValidationResult result, int statusCode, Date requestTimeStamp, long elapsedTime, String requestURI) {
+        if(result == null) {
+            return Optional.empty();
+        }
         AuditLog auditLog = new AuditLog();
         auditLog.setHttpResponseCode(statusCode);
         auditLog.setUri(requestURI);
@@ -25,7 +29,7 @@ public class AuditLogServiceImpl implements AuditLogService{
         auditLog.setIsp(result.getIpProvider());
         auditLog.setRequestTime(requestTimeStamp);
         auditLog.setElapsedTime(elapsedTime);
-        return repository.save(auditLog);
+        return Optional.of(repository.save(auditLog));
     }
 
     @Override
