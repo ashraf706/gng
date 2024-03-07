@@ -1,0 +1,8 @@
+application:
+  environment: dev
+
+
+spring:
+  h2:
+    console:
+      enabled=true:
